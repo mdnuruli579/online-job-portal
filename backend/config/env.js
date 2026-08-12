@@ -1,0 +1,18 @@
+import dotenv from 'dotenv';
+dotenv.config();
+export const DB_URL = process.env.DB_URL;
+export const DB_NAME = process.env.DB_NAME;
+export const DB_HOST = process.env.DB_HOST;
+export const DB_PORT = process.env.DB_PORT;
+export const DB_USER = process.env.DB_USER;
+export const DB_PASSWORD = process.env.DB_PASSWORD;
+export const SSL_MODE = process.env.SSL_MODE;
+export const SECREATE_KEY=process.env.SECREATE_KEY;
+export const GOOGLE_CLIENT_ID=process.env.GOOGLE_CLIENT_ID;
+export const GOOGLE_CLIENT_SECRET=process.env.GOOGLE_CLIENT_SECRET;
+export const GOOGLE_REFRESH_TOKEN=process.env.GOOGLE_REFRESH_TOKEN;
+export const EMAIL_USER=process.env.EMAIL_USER;
+export const API_URL=process.env.API_URL;
+export const CLOUDINARY_NAME = process.env.CLOUDINARY_NAME;
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
