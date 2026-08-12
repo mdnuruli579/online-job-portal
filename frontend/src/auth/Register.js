@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { registerUser } from "../services/auth.service";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData,setFormData]=useState({
@@ -9,6 +12,53 @@ const Register = () => {
     password:"",
     cnfPassword:""
   })
+  const [error,setError]=useState({
+    nameError:"",
+    emailError:"",
+    phoneError:"",
+    passwordError:"",
+    cnfPassError:""
+  })
+  const navigate=useNavigate();
+  const validateform=()=>{
+    setError({
+      nameError:"",
+      emailerror:"",
+      phoneError:"",
+      passwordError:"",
+      cnfPassError:""
+    })
+    const formError={};
+    if(!formData.full_name.trim()){
+      formError.nameError="Name is required";
+    }
+    else if(formData.full_name.trim().length <3){
+      formError.nameError="Name cannot be less than three character";
+    }
+    const mailPattern=/^[^@\s]+@[^@\s]+\.[^@\s]+$/
+    if(!formData.email.trim()){
+      formError.emailError="Email is required";
+    }
+    else if(!mailPattern.test(formData.email.trim())){
+      formError.emailError="Please enter valid email";
+    }
+    const phonePattern=/^[0-9]{10}$/;
+    if(!formData.phone.trim()){
+      formError.phoneError="Phone is required";
+    }
+    else if(!phonePattern.test(formData.phone.trim())){
+      formError.phoneError="Please enter valid phone number";
+    }
+    if(!formData.password.trim()){
+      formError.passwordError="Password is required";
+    }
+    if(formData.cnfPassword.trim()!==formData.password.trim()){
+      formError.cnfPassError="Password does not matched";
+    }
+    setError(formError);
+    return Object.keys(formError).length===0;
+
+  }
   const handleOnChange=(e)=>{
     const name=e.target.name;
     const value=e.target.value;
@@ -19,8 +69,30 @@ const Register = () => {
       }
     ))
   }
-  const hadnleOnSubmit=(e)=>{
-    console.log(formData);
+  const resetForm=()=>{
+    setFormData({
+    full_name:"",
+    email:"",
+    phone:"",
+    user_type:"CANDIDATE",
+    password:"",
+    cnfPassword:""
+  })
+  }
+  const hadnleOnSubmit=async(e)=>{
+    try {
+      if(!validateform())return;
+      const resp=await registerUser(formData);
+      if(resp.data.statusCode===200){
+        toast.success(resp.data.msg);
+        navigate("/login")
+      }else{
+        toast.error(resp.data.msg);
+      }
+      console.log(resp);
+    } catch (error) {
+      console.log(error);
+    }
   }
   return (
     <div
@@ -227,7 +299,7 @@ const Register = () => {
                     <div className="col-md-12">
 
                       <label className="form-label fw-semibold text-dark">
-                        Full Name
+                        Full Name <span className="text-danger">*</span>
                       </label>
 
                       <input
@@ -239,6 +311,11 @@ const Register = () => {
                         onChange={handleOnChange}
 
                       />
+                      {
+                        error.nameError &&
+                        <small className="text-danger">{error.nameError}</small>
+                      }
+                      
 
                     </div>
 
@@ -247,7 +324,7 @@ const Register = () => {
                     <div className="col-12">
 
                       <label className="form-label fw-semibold text-dark">
-                        Email Address
+                        Email Address<span className="text-danger">*</span>
                       </label>
 
                       <input
@@ -258,6 +335,10 @@ const Register = () => {
                         name="email"
                         onChange={handleOnChange}
                       />
+                      {
+                        error.emailError &&
+                        <small className="text-danger">{error.emailError}</small>
+                      }
 
                     </div>
 
@@ -266,7 +347,7 @@ const Register = () => {
                     <div className="col-md-6">
 
                       <label className="form-label fw-semibold text-dark">
-                        Phone Number
+                        Phone Number<span className="text-danger">*</span>
                       </label>
 
                       <input
@@ -277,7 +358,10 @@ const Register = () => {
                         name="phone"
                         onChange={handleOnChange}
                       />
-
+                      {
+                        error.phoneError &&
+                        <small className="text-danger">{error.phoneError}</small>
+                      }
                     </div>
 
 
@@ -294,8 +378,8 @@ const Register = () => {
                         onChange={handleOnChange}
                       >
                         <option>Select account type</option>
-                        <option>Candidate</option>
-                        <option>Recruiter</option>
+                        <option value="CANDIDATE">Candidate</option>
+                        <option value="RECRUITER">Recruiter</option>
                       </select>
 
                     </div>
@@ -305,7 +389,7 @@ const Register = () => {
                     <div className="col-md-6">
 
                       <label className="form-label fw-semibold text-dark">
-                        Password
+                        Password<span className="text-danger">*</span>
                       </label>
 
                       <input
@@ -316,7 +400,10 @@ const Register = () => {
                         name="password"
                         onChange={handleOnChange}
                       />
-
+                      {
+                        error.passwordError &&
+                        <small className="text-danger">{error.passwordError}</small>
+                      }
                     </div>
 
 
@@ -324,7 +411,7 @@ const Register = () => {
                     <div className="col-md-6">
 
                       <label className="form-label fw-semibold text-dark">
-                        Confirm Password
+                        Confirm Password<span className="text-danger">*</span>
                       </label>
 
                       <input
@@ -335,7 +422,10 @@ const Register = () => {
                         name="cnfPassword"
                         onChange={handleOnChange}
                       />
-
+                      {
+                        error.cnfPassError &&
+                        <small className="text-danger">{error.cnfPassError}</small>
+                      }
                     </div>
 
 

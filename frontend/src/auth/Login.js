@@ -1,6 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { loginUser } from "../services/auth.service";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [email,setEmail]=useState("");
+  const [password,setPassword]=useState("");
+  const [emailError,setEmailError]=useState("");
+  const [passError,setPassError]=useState("");
+  const navigate=useNavigate();
+  const handleOnSubmit=async(e)=>{
+    try {
+      const resp=await loginUser({email,password});
+      if(resp.data.statusCode===200){
+        toast.success(resp.data.msg);
+        if(resp.data.data && resp.data.data?.user_type==="CANDIDATE"){
+          navigate('/candidate')
+        }
+        else if(resp.data.data && resp.data.data?.user_type==="RECRUITER"){
+          navigate('/recruiter')
+        }
+        else if(resp.data.data && resp.data.data?.user_type==="ADMIN"){
+          navigate('/admin')
+        }
+      }else{
+        toast.error(resp.data.msg);
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
   return (
     <div
       className="min-vh-100 d-flex align-items-center py-5"
@@ -147,7 +176,7 @@ const Login = () => {
                   <div className="mb-4">
 
                     <label className="form-label fw-semibold">
-                      Email Address
+                      Email Address <span className="text-danger">*</span>
                     </label>
 
                     <div className="input-group">
@@ -160,8 +189,13 @@ const Login = () => {
                         type="email"
                         className="form-control form-control-lg bg-light border-0"
                         placeholder="you@example.com"
+                        value={email}
+                        onChange={(e)=>setEmail(e.target.value)}
                       />
-
+                      {
+                        emailError &&
+                        <small className="text-danger">{emailError}</small>
+                      }
                     </div>
 
                   </div>
@@ -173,7 +207,7 @@ const Login = () => {
                     <div className="d-flex justify-content-between">
 
                       <label className="form-label fw-semibold">
-                        Password
+                        Password <span className="text-danger">*</span>
                       </label>
 
                       <a
@@ -197,8 +231,13 @@ const Login = () => {
                         type="password"
                         className="form-control form-control-lg bg-light border-0"
                         placeholder="Enter your password"
+                        value={password}
+                        onChange={(e)=>setPassword(e.target.value)}
                       />
-
+                      {
+                        passError &&
+                        <small className="text-danger">{passError}</small>
+                      }
                     </div>
 
                   </div>
@@ -226,6 +265,7 @@ const Login = () => {
                   {/* ================= LOGIN BUTTON ================= */}
                   <button
                     type="button"
+                    onClick={handleOnSubmit}
                     className="btn btn-lg w-100 text-white fw-semibold py-3 rounded-3"
                     style={{
                       background:

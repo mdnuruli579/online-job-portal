@@ -1,10 +1,16 @@
 import express from 'express'
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB, { sequelize } from './config/db.js';
 import mainRoute from './routes/mainRoute.js';
 import './models/index.js';
 dotenv.config();
 const app = express();
+const corsOption={
+  origin:"*",
+  credentials:true,
+}
+app.use(cors(corsOption));
 const PORT = 8080;
 app.use(express.json());
 app.get('/', (req, res) => {

@@ -21,13 +21,16 @@ export const register = async(data) => {
     });
     if (res?.user_type?.toUpperCase() === "CANDIDATE" || res?.user_type?.toUpperCase()==="RECRUITER") {
       // send verification mail to user
-      const token=await generateToken({id:res.user_id,email:res.email,role:res.user_type})
-      await sendUserMail(email,token);
-      return response("Email has been sent for verification", 200);
+      res.status="ACTIVE";
+      await res.save();
+      return response("User register successfully", 200,res);
+      // const token=await generateToken({id:res.user_id,email:res.email,role:res.user_type})
+      // await sendUserMail(email,token);
+      // return response("Email has been sent for verification", 200);
     }
     else if(res?.user_type?.toUpperCase()==="ADMIN"){
       res.status="ACTIVE";
-      res.save();
+      await res.save();
       return response("User register successfully", 200,res);
     }
     await res.destory();
