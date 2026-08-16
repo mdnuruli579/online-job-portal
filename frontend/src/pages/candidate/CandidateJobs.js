@@ -1,152 +1,12 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getJobs } from "../../services/job.service";
 
 const CandidateJobs = () => {
-  const jobs = [
-    {
-      job_id: 1,
-      title: "Senior React Developer",
-      job_description:
-        "Develop and maintain modern web applications using React.",
-      requirements:
-        "3+ years of frontend development experience with strong React knowledge.",
-      skills: "React, JavaScript, HTML, CSS, Bootstrap",
-      category_id: 1,
-      company_id: 1,
-      recruiter_id: 5,
-      location: "Noida, India",
-      work_mode: "HYBRID",
-      employment_type: "FULL_TIME",
-      experience_min: 3,
-      experience_max: 6,
-      salary_min: 1000000,
-      salary_max: 1500000,
-      salary_currency: "INR",
-      vacancies: 2,
-      posted_on: "2026-08-10",
-      application_deadline: "2026-09-10",
-      status: "ACTIVE",
+  const [jobs,setJobs]=useState([]);
+  const [total,setTotal]=useState(0);
 
-      company: {
-        company_id: 1,
-        company_name: "TechNova Solutions",
-        industry: "Information Technology",
-        company_size: 500,
-        company_logo: "",
-        company_website: "https://technova.example.com",
-        about_company:
-          "Technology company building modern software solutions.",
-      },
-    },
-
-    {
-      job_id: 2,
-      title: "Node.js Developer",
-      job_description:
-        "Build scalable backend services and REST APIs using Node.js.",
-      requirements:
-        "2+ years of Node.js and Express development experience.",
-      skills: "Node.js, Express, Sequelize, MySQL, REST API",
-      category_id: 1,
-      company_id: 2,
-      recruiter_id: 6,
-      location: "Delhi, India",
-      work_mode: "ONSITE",
-      employment_type: "FULL_TIME",
-      experience_min: 2,
-      experience_max: 5,
-      salary_min: 700000,
-      salary_max: 1200000,
-      salary_currency: "INR",
-      vacancies: 3,
-      posted_on: "2026-08-08",
-      application_deadline: "2026-09-05",
-      status: "ACTIVE",
-
-      company: {
-        company_id: 2,
-        company_name: "Vertex Technologies",
-        industry: "Software Development",
-        company_size: 300,
-        company_logo: "",
-        company_website: "https://vertex.example.com",
-        about_company:
-          "Software company developing enterprise technology products.",
-      },
-    },
-
-    {
-      job_id: 3,
-      title: "Frontend Engineer",
-      job_description:
-        "Create responsive and accessible user interfaces for web applications.",
-      requirements:
-        "Strong JavaScript fundamentals and experience with modern frontend frameworks.",
-      skills: "React, JavaScript, TypeScript, CSS, Bootstrap",
-      category_id: 1,
-      company_id: 3,
-      recruiter_id: 7,
-      location: "Remote",
-      work_mode: "REMOTE",
-      employment_type: "FULL_TIME",
-      experience_min: 2,
-      experience_max: 4,
-      salary_min: 800000,
-      salary_max: 1400000,
-      salary_currency: "INR",
-      vacancies: 2,
-      posted_on: "2026-08-06",
-      application_deadline: "2026-09-15",
-      status: "ACTIVE",
-
-      company: {
-        company_id: 3,
-        company_name: "PixelCraft Labs",
-        industry: "Information Technology",
-        company_size: 150,
-        company_logo: "",
-        company_website: "https://pixelcraft.example.com",
-        about_company:
-          "Product-focused technology company creating digital experiences.",
-      },
-    },
-
-    {
-      job_id: 4,
-      title: "Full Stack Developer",
-      job_description:
-        "Work across frontend and backend systems to build scalable applications.",
-      requirements:
-        "Experience with React, Node.js and relational databases.",
-      skills: "React, Node.js, Express, MySQL, Sequelize",
-      category_id: 1,
-      company_id: 4,
-      recruiter_id: 8,
-      location: "Gurugram, India",
-      work_mode: "HYBRID",
-      employment_type: "FULL_TIME",
-      experience_min: 3,
-      experience_max: 7,
-      salary_min: 1200000,
-      salary_max: 1800000,
-      salary_currency: "INR",
-      vacancies: 1,
-      posted_on: "2026-08-04",
-      application_deadline: "2026-09-01",
-      status: "ACTIVE",
-
-      company: {
-        company_id: 4,
-        company_name: "CloudMatrix Technologies",
-        industry: "Cloud Computing",
-        company_size: 800,
-        company_logo: "",
-        company_website: "https://cloudmatrix.example.com",
-        about_company:
-          "Technology organization delivering cloud-based enterprise solutions.",
-      },
-    },
-  ];
 
   const formatSalary = (job) => {
     const min = job.salary_min / 100000;
@@ -165,7 +25,21 @@ const CandidateJobs = () => {
   const formatWorkMode = (mode) => {
     return mode.charAt(0) + mode.slice(1).toLowerCase();
   };
-
+  const getAllJobs=async()=>{
+    try {
+      const response=await getJobs();
+      console.log(response);
+      if(response.data?.statusCode===200){
+        setJobs(response.data?.data?.jobs);
+        setTotal(response.data?.data?.total);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  useEffect(()=>{
+    getAllJobs();
+  },[])
   return (
     <div>
 
@@ -197,7 +71,7 @@ const CandidateJobs = () => {
           <div className="text-md-end">
             <span className="text-secondary">
               <strong className="text-dark">
-                {jobs.length}
+                {total}
               </strong>{" "}
               jobs available
             </span>
@@ -489,7 +363,7 @@ const CandidateJobs = () => {
               <span className="text-secondary">
                 Showing{" "}
                 <strong className="text-dark">
-                  {jobs.length}
+                  {total}
                 </strong>{" "}
                 jobs
               </span>
@@ -542,7 +416,10 @@ const CandidateJobs = () => {
                         fontWeight: "700",
                       }}
                     >
-                      {job.company.company_name.charAt(0)}
+                      <img 
+                      height={40}
+                      width={40}
+                      src={job.Company.company_logo}/>
                     </div>
 
                   </div>
@@ -570,7 +447,7 @@ const CandidateJobs = () => {
                         </Link>
 
                         <p className="text-secondary mb-2">
-                          {job.company.company_name}
+                          {job?.Company?.company_name}
                         </p>
 
                       </div>
@@ -592,7 +469,7 @@ const CandidateJobs = () => {
                     <div className="d-flex flex-wrap gap-2 mb-3">
 
                       <span className="badge bg-light text-secondary fw-normal px-3 py-2">
-                        📍 {job.location}
+                        📍 {job?.location}
                       </span>
 
                       <span className="badge bg-light text-secondary fw-normal px-3 py-2">

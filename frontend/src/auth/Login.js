@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { loginUser } from "../services/auth.service";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 const Login = () => {
   const [email,setEmail]=useState("");
@@ -9,11 +10,23 @@ const Login = () => {
   const [emailError,setEmailError]=useState("");
   const [passError,setPassError]=useState("");
   const navigate=useNavigate();
+  const {setToken}=useAuth();
   const handleOnSubmit=async(e)=>{
     try {
       const resp=await loginUser({email,password});
       if(resp.data.statusCode===200){
         toast.success(resp.data.msg);
+        const user={
+          id:resp.data?.data?.id,
+          name:resp.data?.data?.full_name,
+          role:resp.data?.data?.user_type,
+          email:resp.data?.data?.email,
+          phone:resp.data?.data?.phone
+        }
+        const token=resp.data?.data?.token;
+        localStorage.setItem("token",token);
+        setToken(token);
+        localStorage.setItem("user",JSON.stringify(user));
         if(resp.data.data && resp.data.data?.user_type==="CANDIDATE"){
           navigate('/candidate')
         }

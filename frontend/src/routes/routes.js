@@ -19,72 +19,95 @@ import RecruiterSettings from '../pages/recruiter/RecruiterSettings';
 import AdminLayout from '../layout/AdminLayout';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminUsers from '../pages/admin/AdminUsers';
+import ProtectedRoute from './ProtectedRoute';
+import Unauthorized from '../common/Unauthorized';
 export const routes = [
-    { path: '/register', element: <Register/>, children: [] },
+    { path: '/register', element: <Register />, children: [] },
     { path: '/login', element: <Login />, children: [] },
+    //Candidate
     {
-        path: '/candidate',
-        element: <CandidateLayout />,
+        element: <ProtectedRoute allowedRoles={["CANDIDATE"]} />,
         children: [
-            { index: true, element: <CandidateDashboard /> },
-            { path: 'jobs', element: <CandidateJobs /> },
-            { path: 'applications', element: <Applications /> },
-            { path: 'profile', element: <Profile /> }
+            {
+                path: '/candidate',
+                element: <CandidateLayout />,
+                children: [
+                    { index: true, element: <CandidateDashboard /> },
+                    { path: 'jobs', element: <CandidateJobs /> },
+                    { path: 'applications', element: <Applications /> },
+                    { path: 'profile', element: <Profile /> }
+                ]
+            }
+        ]
+    },
+    //Recruiter
+    {
+        element: <ProtectedRoute allowedRoles={['RECRUITER']} />,
+        children: [
+            {
+                path: '/recruiter',
+                element: <RecruiterLayout />,
+                children: [
+                    { index: true, element: <RecruiterDashboard /> },
+                    { path: 'jobs', element: <RecruiterJobs /> },
+                    { path: 'jobs/create', element: <CreateJob /> },
+                    { path: 'applications', element: <RecruiterApplications /> },
+                    { path: 'candidates', element: <RecruiterCandidates /> },
+                    { path: 'company', element: <CompanyProfile /> },
+                    { path: 'settings', element: <RecruiterSettings /> }
+                ]
+            }
+        ]
+    },
+    //Admin
+    {
+        element: <ProtectedRoute allowedRoles={['ADMIN']} />,
+        children: [
+            {
+                path: '/admin',
+                element: <AdminLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <AdminDashboard />,
+                    },
+                    {
+                        path: "users",
+                        element: <AdminUsers />,
+                    },
+                    /*{
+                        path: "recruiters",
+                        element: <AdminRecruiters />,
+                    },
+                    {
+                        path: "companies",
+                        element: <AdminCompanies />,
+                    },
+                    {
+                        path: "jobs",
+                        element: <AdminJobs />,
+                    },
+                    {
+                        path: "jobs/pending",
+                        element: <PendingJobs />,
+                    },
+                    {
+                        path: "applications",
+                        element: <AdminApplications />,
+                    },
+                    {
+                        path: "categories",
+                        element: <JobCategories />,
+                    },
+                    {
+                        path: "settings",
+                        element: <AdminSettings />,
+                    }*/
+                ]
+            }
         ]
     },
     {
-        path: '/recruiter',
-        element: <RecruiterLayout />,
-        children: [
-            { index: true, element: <RecruiterDashboard/> },
-            { path: 'jobs', element: <RecruiterJobs/> },
-            { path: 'jobs/create', element: <CreateJob /> },
-            { path: 'applications', element: <RecruiterApplications /> },
-            { path: 'candidates', element: <RecruiterCandidates /> },
-            { path: 'company', element: <CompanyProfile /> },
-            { path: 'settings', element: <RecruiterSettings /> }
-        ]
-    },
-    {
-        path: '/admin',
-        element: <AdminLayout />,
-        children: [
-            {
-                index: true,
-                element: <AdminDashboard />,
-            },
-            {
-                path: "users",
-                element: <AdminUsers />,
-            },
-            /*{
-                path: "recruiters",
-                element: <AdminRecruiters />,
-            },
-            {
-                path: "companies",
-                element: <AdminCompanies />,
-            },
-            {
-                path: "jobs",
-                element: <AdminJobs />,
-            },
-            {
-                path: "jobs/pending",
-                element: <PendingJobs />,
-            },
-            {
-                path: "applications",
-                element: <AdminApplications />,
-            },
-            {
-                path: "categories",
-                element: <JobCategories />,
-            },
-            {
-                path: "settings",
-                element: <AdminSettings />,
-            }*/
-        ]
+        path:'/unauthorized',element:<Unauthorized/>
     }
 ]
