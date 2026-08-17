@@ -1,17 +1,20 @@
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import multer from 'multer';
-import {v2 as cloudinary} from 'cloudinary';
-import { API_URL, 
+import { Op } from "sequelize";
+import { v2 as cloudinary } from 'cloudinary';
+import {
+  API_URL,
   CLOUDINARY_NAME,
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
-  EMAIL_USER, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, SECREATE_KEY } from '../config/env.js';
+  EMAIL_USER, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, SECREATE_KEY
+} from '../config/env.js';
 export const generateToken = ({ id, email, role }) => {
-    const token = jwt.sign({ id, role, email }, SECREATE_KEY, { expiresIn: '15m' });
-    return token;
+  const token = jwt.sign({ id, role, email }, SECREATE_KEY, { expiresIn: '15m' });
+  return token;
 }
-export const upload=multer({storage:multer.memoryStorage()});
+export const upload = multer({ storage: multer.memoryStorage() });
 //configuration of cloudinary
 cloudinary.config({
   cloud_name: CLOUDINARY_NAME,
@@ -20,23 +23,138 @@ cloudinary.config({
 })
 export const uploadcloudinary = cloudinary;
 export const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        type: "OAuth2",
-        user: EMAIL_USER,
-        clientId: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET,
-        refreshToken: GOOGLE_REFRESH_TOKEN,
-    },
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: EMAIL_USER,
+    clientId: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    refreshToken: GOOGLE_REFRESH_TOKEN,
+  },
 });
+export const getWereFilter = (filters) => {
+  const where = {};
 
-export const sendUserMail = async (email,token) => {
-    const verificationLink=`${API_URL}/user/verify-email?token=${token}`;
-    return await transporter.sendMail({
-        from: `"MyAnatomy AI <no-reply>" <${EMAIL_USER}>`,
-        to: email,
-        subject: "Verify Your Email Address",
-        html: `
+  // =========================
+  // CATEGORY
+  // =========================
+
+  const category = filters.find(
+    (item) => item.type === "category"
+  );
+
+  if (category) {
+    where.category_id = Number(category.value);
+  }
+
+  // =========================
+  // EMPLOYMENT
+  // =========================
+
+  const employment = filters
+    .filter(
+      (item) => item.type === "employment"
+    )
+    .map((item) => item.value);
+
+  if (employment.length > 0) {
+    where.employment_type = {
+      [Op.in]: employment
+    };
+  }
+
+  // =========================
+  // EXPERIENCE
+  // =========================
+
+  const experience = filters.find(
+    (item) => item.type === "experience"
+  );
+
+  if (experience) {
+    switch (experience.value) {
+      case "0-2":
+        where.experience_min = {
+          [Op.lte]: 2
+        };
+        break;
+
+      case "2-4":
+        where.experience_min = {
+          [Op.gte]: 2
+        };
+        where.experience_max = {
+          [Op.lte]: 4
+        };
+        break;
+
+      case "4-6":
+        where.experience_min = {
+          [Op.gte]: 4
+        };
+        where.experience_max = {
+          [Op.lte]: 6
+        };
+        break;
+
+      case "6+":
+        where.experience_min = {
+          [Op.gte]: 6
+        };
+        break;
+    }
+  }
+
+  // =========================
+  // SALARY
+  // =========================
+
+  const salary = filters.find(
+    (item) => item.type === "salary"
+  );
+
+  if (salary) {
+    switch (salary.value) {
+      case "0-5":
+        where.salary_min = {
+          [Op.lte]: 500000
+        };
+        break;
+
+      case "5-10":
+        where.salary_min = {
+          [Op.gte]: 500000
+        };
+        where.salary_max = {
+          [Op.lte]: 1000000
+        };
+        break;
+
+      case "10-15":
+        where.salary_min = {
+          [Op.gte]: 1000000
+        };
+        where.salary_max = {
+          [Op.lte]: 1500000
+        };
+        break;
+
+      case "15+":
+        where.salary_min = {
+          [Op.gte]: 1500000
+        };
+        break;
+    }
+  }
+  return where
+}
+export const sendUserMail = async (email, token) => {
+  const verificationLink = `${API_URL}/user/verify-email?token=${token}`;
+  return await transporter.sendMail({
+    from: `"MyAnatomy AI <no-reply>" <${EMAIL_USER}>`,
+    to: email,
+    subject: "Verify Your Email Address",
+    html: `
     <!DOCTYPE html>
     <html>
     <head>
@@ -120,8 +238,8 @@ export const sendUserMail = async (email,token) => {
     </body>
     </html>
   `,
-    });
+  });
 }
-export const verifyToken=async(token)=>{
-  return jwt.verify(token,SECREATE_KEY);
+export const verifyToken = async (token) => {
+  return jwt.verify(token, SECREATE_KEY);
 }

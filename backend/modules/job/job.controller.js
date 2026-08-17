@@ -14,8 +14,11 @@ export const createJobController = async (req, resp) => {
   return resp.json(result);
 }
 export const getAllJobController = async (req, resp) => {
-  const { limit=5, offset=0 } = req.query;
-  const result = await getAllJobService(limit, offset);
+  const { limit=5, offset=0,filters } = req.query;
+  const parsedFilters = filters
+      ? JSON.parse(filters)
+      : [];
+  const result = await getAllJobService(limit, offset,parsedFilters);
   return resp.json(result);
 }
 export const getJobByRectruiterController = async (req, resp) => {

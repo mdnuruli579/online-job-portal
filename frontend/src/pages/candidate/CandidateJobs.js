@@ -4,10 +4,10 @@ import { toast } from "react-toastify";
 import { getJobs } from "../../services/job.service";
 
 const CandidateJobs = () => {
-  const [jobs,setJobs]=useState([]);
-  const [total,setTotal]=useState(0);
-
-
+  const [jobs, setJobs] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [filters, setFilters] = useState([]);
   const formatSalary = (job) => {
     const min = job.salary_min / 100000;
     const max = job.salary_max / 100000;
@@ -25,11 +25,54 @@ const CandidateJobs = () => {
   const formatWorkMode = (mode) => {
     return mode.charAt(0) + mode.slice(1).toLowerCase();
   };
-  const getAllJobs=async()=>{
+  const clearFilter=()=>{
+    setFilters([]);
+  }
+  const handleFilterChange = (type, value) => {
+    setFilters((prev) => {
+      // Employment allows multiple selections
+      if (type === "employment") {
+        const exists = prev.some(
+          (item) =>
+            item.type === "employment" &&
+            item.value === value
+        );
+
+        if (exists) {
+          return prev.filter(
+            (item) =>
+              !(item.type === "employment" &&
+                item.value === value)
+          );
+        }
+
+        return [...prev, { type, value }];
+      }
+
+      // Category, experience and salary
+      // allow only one selection
+      const filtered = prev.filter(
+        (item) => item.type !== type
+      );
+
+      if (!value) {
+        return filtered;
+      }
+
+      return [
+        ...filtered,
+        {
+          type,
+          value
+        }
+      ];
+    });
+  };
+  const getAllJobs = async (limit, offset, filters) => {
     try {
-      const response=await getJobs();
+      const response = await getJobs(limit, offset, filters);
       console.log(response);
-      if(response.data?.statusCode===200){
+      if (response.data?.statusCode === 200) {
         setJobs(response.data?.data?.jobs);
         setTotal(response.data?.data?.total);
       }
@@ -37,9 +80,11 @@ const CandidateJobs = () => {
       toast.error(error.message);
     }
   }
-  useEffect(()=>{
-    getAllJobs();
-  },[])
+  const PAGE_NUMBER = Math.ceil(total / 5);
+  const offset = currentPage * 5;
+  useEffect(() => {
+    getAllJobs(5, offset, filters);
+  }, [currentPage,filters])
   return (
     <div>
 
@@ -192,6 +237,7 @@ const CandidateJobs = () => {
 
                 <button
                   className="btn btn-sm p-0"
+                  onClick={clearFilter}
                   style={{
                     color: "#7f1d3f",
                   }}
@@ -209,13 +255,17 @@ const CandidateJobs = () => {
                   Job Category
                 </label>
 
-                <select className="form-select bg-light border-0">
+                <select
+                  onChange={(e) =>
+                    handleFilterChange("category", e.target.value)
+                  }
+                  className="form-select bg-light border-0">
 
-                  <option>All Categories</option>
-                  <option>Software Development</option>
-                  <option>Data Science</option>
-                  <option>UI/UX Design</option>
-                  <option>Marketing</option>
+                  <option value="">All Categories</option>
+                  <option value="1">Software Development</option>
+                  <option value="2">Data Science</option>
+                  <option value="3">UI/UX Design</option>
+                  <option value="4">Marketing</option>
 
                 </select>
 
@@ -237,6 +287,13 @@ const CandidateJobs = () => {
                       className="form-check-input"
                       type="checkbox"
                       id="fulltime"
+                      value="FULL_TIME"
+                      onChange={(e) =>
+                        handleFilterChange(
+                          "employment",
+                          e.target.value
+                        )
+                      }
                     />
 
                     <label
@@ -255,6 +312,13 @@ const CandidateJobs = () => {
                       className="form-check-input"
                       type="checkbox"
                       id="parttime"
+                      value="PART_TIME"
+                      onChange={(e) =>
+                        handleFilterChange(
+                          "employment",
+                          e.target.value
+                        )
+                      }
                     />
 
                     <label
@@ -273,6 +337,13 @@ const CandidateJobs = () => {
                       className="form-check-input"
                       type="checkbox"
                       id="contract"
+                      value="CONTRACT"
+                      onChange={(e) =>
+                        handleFilterChange(
+                          "employment",
+                          e.target.value
+                        )
+                      }
                     />
 
                     <label
@@ -291,6 +362,13 @@ const CandidateJobs = () => {
                       className="form-check-input"
                       type="checkbox"
                       id="internship"
+                      value="INTERNSHIP"
+                      onChange={(e) =>
+                        handleFilterChange(
+                          "employment",
+                          e.target.value
+                        )
+                      }
                     />
 
                     <label
@@ -314,13 +392,20 @@ const CandidateJobs = () => {
                   Experience
                 </label>
 
-                <select className="form-select bg-light border-0">
+                <select
+                  onChange={(e) =>
+                    handleFilterChange(
+                      "experience",
+                      e.target.value
+                    )
+                  }
+                  className="form-select bg-light border-0">
 
-                  <option>Any Experience</option>
-                  <option>0 - 2 Years</option>
-                  <option>2 - 4 Years</option>
-                  <option>4 - 6 Years</option>
-                  <option>6+ Years</option>
+                  <option value="">Any Experience</option>
+                  <option value="0-2">0 - 2 Years</option>
+                  <option value="2-4">2 - 4 Years</option>
+                  <option value="4-6">4 - 6 Years</option>
+                  <option value="6+">6+ Years</option>
 
                 </select>
 
@@ -334,13 +419,20 @@ const CandidateJobs = () => {
                   Salary
                 </label>
 
-                <select className="form-select bg-light border-0">
+                <select
+                  onChange={(e) =>
+                    handleFilterChange(
+                      "salary",
+                      e.target.value
+                    )
+                  }
+                  className="form-select bg-light border-0">
 
-                  <option>Any Salary</option>
-                  <option>₹0 - ₹5 LPA</option>
-                  <option>₹5 - ₹10 LPA</option>
-                  <option>₹10 - ₹15 LPA</option>
-                  <option>₹15+ LPA</option>
+                  <option value="">Any Salary</option>
+                  <option value="0-5">₹0 - ₹5 LPA</option>
+                  <option value="5-10">₹5 - ₹10 LPA</option>
+                  <option value="10-15">₹10 - ₹15 LPA</option>
+                  <option value="15+">₹15+ LPA</option>
 
                 </select>
 
@@ -416,10 +508,10 @@ const CandidateJobs = () => {
                         fontWeight: "700",
                       }}
                     >
-                      <img 
-                      height={40}
-                      width={40}
-                      src={job.Company.company_logo}/>
+                      <img
+                        height={40}
+                        width={40}
+                        src={job?.company?.company_logo} />
                     </div>
 
                   </div>
@@ -447,7 +539,7 @@ const CandidateJobs = () => {
                         </Link>
 
                         <p className="text-secondary mb-2">
-                          {job?.Company?.company_name}
+                          {job?.company?.company_name}
                         </p>
 
                       </div>
@@ -486,12 +578,10 @@ const CandidateJobs = () => {
                       </span>
 
                     </div>
-
-
                     {/* SKILLS */}
                     <div className="d-flex flex-wrap gap-2 mb-3">
 
-                      {job.skills.split(",").map((skill) => (
+                      {job?.skills?.split(",").map((skill) => (
 
                         <span
                           key={skill}
@@ -581,38 +671,28 @@ const CandidateJobs = () => {
 
               <ul className="pagination">
 
-                <li className="page-item disabled">
-                  <button className="page-link">
+                <li className={`page-item ${currentPage === 0 ? 'disabled' : ''}`}>
+                  <button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className="page-link">
                     Previous
                   </button>
                 </li>
-
-                <li className="page-item active">
+                {
+                  [...Array(PAGE_NUMBER)].map((_, index) => (
+                    <li className={`page-item ${currentPage === index ? 'active' : ''}`} key={index}>
+                      <button
+                        onClick={() => setCurrentPage(index)}
+                        className="page-link">
+                        {index + 1}
+                      </button>
+                    </li>
+                  ))
+                }
+                <li className={`page-item ${currentPage + 1 === PAGE_NUMBER ? 'disabled' : ''}`}>
                   <button
-                    className="page-link"
-                    style={{
-                      backgroundColor: "#7f1d3f",
-                      borderColor: "#7f1d3f",
-                    }}
-                  >
-                    1
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button className="page-link">
-                    2
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button className="page-link">
-                    3
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button className="page-link">
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="page-link">
                     Next
                   </button>
                 </li>

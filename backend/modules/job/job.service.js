@@ -1,5 +1,7 @@
 import { response } from '../../utils/response.js';
 import { Job,Company, JobCategory} from '../../models/index.js';
+import { getWereFilter } from '../../utils/common.js';
+import { sequelize } from '../../config/db.js';
 export const createJobService = async (user_id, data) => {
   try {
     const { company_id } = data;
@@ -13,9 +15,11 @@ export const createJobService = async (user_id, data) => {
     return response(error.message, 400);
   }
 }
-export const getAllJobService = async (limit,offset) => {
+export const getAllJobService = async (limit,offset,filters) => {
   try {
+    const where=getWereFilter(filters);
     const { count, rows } = await Job.findAndCountAll({
+      where,
       include: [{ model: Company, required: true }, { model: JobCategory, required: true }],
       offset: Number(offset),
       limit: Number(limit),

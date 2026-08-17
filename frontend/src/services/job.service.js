@@ -1,5 +1,11 @@
 import api from "../api/axios";
 
-export const getJobs = () => {
-  return api.get("/job");
-};
+export const getJobs = (limit,offset,filters) => {
+  return api.get('/job',{
+    params: {
+    limit: limit,
+    offset: offset,
+    filters: JSON.stringify(filters)
+    }
+})
+}
