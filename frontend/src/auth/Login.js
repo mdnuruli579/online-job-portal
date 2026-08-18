@@ -1,42 +1,41 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { loginUser } from "../services/auth.service";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 
 const Login = () => {
-  const [email,setEmail]=useState("");
-  const [password,setPassword]=useState("");
-  const [emailError,setEmailError]=useState("");
-  const [passError,setPassError]=useState("");
-  const navigate=useNavigate();
-  const {setToken}=useAuth();
-  const handleOnSubmit=async(e)=>{
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passError, setPassError] = useState("");
+  const navigate = useNavigate();
+  const { setToken } = useAuth();
+  const handleOnSubmit = async (e) => {
     try {
-      const resp=await loginUser({email,password});
-      if(resp.data.statusCode===200){
+      const resp = await loginUser({ email, password });
+      if (resp.data.statusCode === 200) {
         toast.success(resp.data.msg);
-        const user={
-          id:resp.data?.data?.id,
-          name:resp.data?.data?.full_name,
-          role:resp.data?.data?.user_type,
-          email:resp.data?.data?.email,
-          phone:resp.data?.data?.phone
+        const user = {
+          id: resp.data?.data?.id,
+          name: resp.data?.data?.full_name,
+          role: resp.data?.data?.user_type,
+          email: resp.data?.data?.email,
+          phone: resp.data?.data?.phone
         }
-        const token=resp.data?.data?.token;
-        localStorage.setItem("token",token);
+        const token = resp.data?.data?.token;
+        localStorage.setItem("token", token);
         setToken(token);
-        localStorage.setItem("user",JSON.stringify(user));
-        if(resp.data.data && resp.data.data?.user_type==="CANDIDATE"){
-          navigate('/candidate')
+        localStorage.setItem("user", JSON.stringify(user));
+        const role = resp.data?.data?.user_type;
+        if (role === "CANDIDATE") {
+          navigate("/candidate", { replace: true });
+        } else if (role === "RECRUITER") {
+          navigate("/recruiter", { replace: true });
+        } else if (role === "ADMIN") {
+          navigate("/admin", { replace: true });
         }
-        else if(resp.data.data && resp.data.data?.user_type==="RECRUITER"){
-          navigate('/recruiter')
-        }
-        else if(resp.data.data && resp.data.data?.user_type==="ADMIN"){
-          navigate('/admin')
-        }
-      }else{
+      } else {
         toast.error(resp.data.msg);
       }
     } catch (error) {
@@ -203,7 +202,7 @@ const Login = () => {
                         className="form-control form-control-lg bg-light border-0"
                         placeholder="you@example.com"
                         value={email}
-                        onChange={(e)=>setEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                       {
                         emailError &&
@@ -245,7 +244,7 @@ const Login = () => {
                         className="form-control form-control-lg bg-light border-0"
                         placeholder="Enter your password"
                         value={password}
-                        onChange={(e)=>setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                       {
                         passError &&

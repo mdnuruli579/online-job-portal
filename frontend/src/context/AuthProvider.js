@@ -37,6 +37,7 @@ const AuthProvider = ({ children }) => {
         setToken,
         setUser,
         loading,
+        setLoading
       }}
     >
       {children}

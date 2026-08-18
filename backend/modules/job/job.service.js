@@ -1,5 +1,5 @@
 import { response } from '../../utils/response.js';
-import { Job,Company, JobCategory} from '../../models/index.js';
+import { Job,Company, JobCategory, Application} from '../../models/index.js';
 import { getWereFilter } from '../../utils/common.js';
 import { sequelize } from '../../config/db.js';
 export const createJobService = async (user_id, data) => {
@@ -15,12 +15,21 @@ export const createJobService = async (user_id, data) => {
     return response(error.message, 400);
   }
 }
-export const getAllJobService = async (limit,offset,filters) => {
+export const getAllJobService = async (limit,offset,filters,id) => {
   try {
     const where=getWereFilter(filters);
     const { count, rows } = await Job.findAndCountAll({
       where,
-      include: [{ model: Company, required: true }, { model: JobCategory, required: true }],
+      include: [
+        { model: Company, required: false }, 
+        { model: JobCategory, required: false },
+        { model: Application,
+          required: false,
+          where: {
+            candidate_id: id
+          },
+        }
+      ],
       offset: Number(offset),
       limit: Number(limit),
     });
@@ -51,7 +60,11 @@ export const getjobByIdService = async (id) => {
       where: {
         job_id: Number(id)
       },
-      include: [{ model: Company, required: true }, { model: JobCategory, required: true }],
+      include: [
+        { model: Company, required: true }, 
+        { model: JobCategory, required: true },
+        { model: Application, required: true }
+      ],
     });
     return response("fetched job list", 200, job);
   } catch (error) {

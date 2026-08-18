@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-const appliationModel = (sequelize) => {
+const applicationModel = (sequelize) => {
   return sequelize.define(
-    'application',
+    'Application',
     {
       application_id: {
         type: DataTypes.INTEGER,
@@ -10,14 +10,15 @@ const appliationModel = (sequelize) => {
       },
       applied_on: {
         type: DataTypes.DATE,
-        default:DataTypes.NOW,
-        allowNull:false
+        defaultValue:DataTypes.NOW,
+        allowNull: false
       },
       status: {
-        type: DataTypes.STRING,
-        allowNull:false
+        type: DataTypes.ENUM('APPLIED','UNDER_REVIEW','SHORTLISTED','SELECTED','NOT_SELECTED'),
+        allowNull: false,
+        defaultValue: "APPLIED"
       }
     }
   );
 }
-export default appliationModel;
+export default applicationModel;

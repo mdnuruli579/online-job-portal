@@ -21,6 +21,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminUsers from '../pages/admin/AdminUsers';
 import ProtectedRoute from './ProtectedRoute';
 import Unauthorized from '../common/Unauthorized';
+import JobDetails from '../pages/candidate/JobDetails';
 export const routes = [
     { path: '/register', element: <Register />, children: [] },
     { path: '/login', element: <Login />, children: [] },
@@ -34,6 +35,7 @@ export const routes = [
                 children: [
                     { index: true, element: <CandidateDashboard /> },
                     { path: 'jobs', element: <CandidateJobs /> },
+                    { path: 'jobs/:id', element: <JobDetails /> },
                     { path: 'applications', element: <Applications /> },
                     { path: 'profile', element: <Profile /> }
                 ]

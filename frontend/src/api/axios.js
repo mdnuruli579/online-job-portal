@@ -31,35 +31,35 @@ api.interceptors.request.use(
 );
 
 // GLOBAL RESPONSE ERROR HANDLER
-api.interceptors.response.use(
-  (response) => {
+// api.interceptors.response.use(
+//   (response) => {
 
-    const statusCode = response.data?.statusCode;
+//     const statusCode = response.data?.statusCode;
 
-    // Only 200 and 201 are considered successful
-    if (statusCode === 200 || statusCode === 201) {
-      return response;
-    }
+//     // Only 200 and 201 are considered successful
+//     if (statusCode === 200 || statusCode === 201) {
+//       return response;
+//     }
 
-    // Any other custom status code
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+//     // Any other custom status code
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("user");
 
-    window.location.href = "/login";
+//     window.location.href = "/login";
 
-    return Promise.reject(response);
-  },
+//     return Promise.reject(response);
+//   },
 
-  (error) => {
-    // Actual HTTP error such as 400, 401, 500, 502
-    console.error("HTTP Error:", error);
+//   (error) => {
+//     // Actual HTTP error such as 400, 401, 500, 502
+//     console.error("HTTP Error:", error);
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("user");
 
-    window.location.href = "/login";
+//     window.location.href = "/login";
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 export default api;

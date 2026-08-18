@@ -9,3 +9,4 @@ export const getJobs = (limit,offset,filters) => {
     }
 })
 }
+export const getJobDetails=(id)=>api.get(`job/${id}`);

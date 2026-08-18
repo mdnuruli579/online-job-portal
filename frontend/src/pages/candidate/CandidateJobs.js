@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getJobs } from "../../services/job.service";
+import { useAuth } from '../../context/AuthProvider';
+import Loader from "../../common/Loader";
+import { applyjob } from "../../services/application.service";
 
 const CandidateJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -25,7 +28,7 @@ const CandidateJobs = () => {
   const formatWorkMode = (mode) => {
     return mode.charAt(0) + mode.slice(1).toLowerCase();
   };
-  const clearFilter=()=>{
+  const clearFilter = () => {
     setFilters([]);
   }
   const handleFilterChange = (type, value) => {
@@ -68,6 +71,18 @@ const CandidateJobs = () => {
       ];
     });
   };
+  const applythisJob = async (id) => {
+    try {
+      const response = await applyjob(id);
+      if (response.data && response.data.statusCode === 200) {
+        toast.success(response.data.msg);
+      } else {
+        toast.error(response.data.msg);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
   const getAllJobs = async (limit, offset, filters) => {
     try {
       const response = await getJobs(limit, offset, filters);
@@ -84,7 +99,7 @@ const CandidateJobs = () => {
   const offset = currentPage * 5;
   useEffect(() => {
     getAllJobs(5, offset, filters);
-  }, [currentPage,filters])
+  }, [currentPage, filters])
   return (
     <div>
 
@@ -483,7 +498,7 @@ const CandidateJobs = () => {
 
 
           {/* JOB CARDS */}
-          {jobs.map((job) => (
+          {jobs.length > 0 ? (jobs.map((job) => (
 
             <div
               className="card border-0 shadow-sm rounded-4 mb-3"
@@ -628,7 +643,6 @@ const CandidateJobs = () => {
 
 
                       <div className="d-flex gap-2">
-
                         <Link
                           to={`/candidate/jobs/${job.job_id}`}
                           className="btn btn-sm px-3"
@@ -641,12 +655,13 @@ const CandidateJobs = () => {
                         </Link>
 
                         <button
-                          className="btn btn-sm text-white px-3"
+                          onClick={()=>applythisJob(job.job_id)}
+                          className={`btn btn-sm text-white px-3 ${job?.Applications?.length > 0 ? 'disabled':''}`}
                           style={{
-                            backgroundColor: "#7f1d3f",
+                            backgroundColor: job?.Applications?.length > 0 ? "#aea8a8d6" : "#7f1d3f"
                           }}
                         >
-                          Apply Now
+                          {job?.Applications?.length > 0 ? job?.Applications[0]?.status : 'Apply Now'}
                         </button>
 
                       </div>
@@ -661,7 +676,11 @@ const CandidateJobs = () => {
 
             </div>
 
-          ))}
+          ))
+          ) : (
+            <p className="text-center">Job not found</p>
+          )
+          }
 
 
           {/* ================= PAGINATION ================= */}

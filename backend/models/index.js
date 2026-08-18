@@ -56,5 +56,6 @@ export
     Company,
     Recruiter,
     JobCategory,
-    Job,Application
+    Job,
+    Application
  };

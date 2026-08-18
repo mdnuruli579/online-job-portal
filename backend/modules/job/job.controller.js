@@ -18,12 +18,13 @@ export const getAllJobController = async (req, resp) => {
   const parsedFilters = filters
       ? JSON.parse(filters)
       : [];
-  const result = await getAllJobService(limit, offset,parsedFilters);
+  const id=req?.user?.id;
+  const result = await getAllJobService(limit, offset,parsedFilters,id);
   return resp.json(result);
 }
 export const getJobByRectruiterController = async (req, resp) => {
   const { limit = 5, offset = 0 } = req.query;
-  const recruiter_id = req?.user?.user_id;
+  const recruiter_id = req?.user?.id;
   const result = await getJobByRectruiterService(recruiter_id,limit, offset);
   return resp.json(result);
 }
