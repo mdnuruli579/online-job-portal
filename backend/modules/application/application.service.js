@@ -1,6 +1,6 @@
 import { response } from '../../utils/response.js';
 import { Op } from "sequelize";
-import { Application,Job } from '../../models/index.js';
+import { Application,Company,Job } from '../../models/index.js';
 
 export const applyService = async (job_id, candidate_id) => {
   try {
@@ -24,7 +24,9 @@ export const getAppliedJobService = async (candidate_id) => {
       where: {
         candidate_id:candidate_id
       },
-      include: { model: Job }
+      include: { model: Job,
+        include:[{model:Company}]
+       }
     })
     return response("Fetched job list", 200, result);
   } catch (error) {

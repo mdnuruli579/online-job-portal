@@ -15,9 +15,9 @@ export const createJobService = async (user_id, data) => {
     return response(error.message, 400);
   }
 }
-export const getAllJobService = async (limit,offset,filters,id) => {
+export const getAllJobService = async (limit,offset,filters,id,search) => {
   try {
-    const where=getWereFilter(filters);
+    const where=getWereFilter(filters,search);
     const { count, rows } = await Job.findAndCountAll({
       where,
       include: [

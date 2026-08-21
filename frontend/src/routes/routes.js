@@ -1,28 +1,84 @@
+import { lazy } from "react";
 import Login from '../auth/Login';
 import Register from '../auth/Register';
-//candidate
-import CandidateLayout from '../layout/CandidateLayout';
-import CandidateDashboard from '../pages/candidate/CandidateDashboard';
-import CandidateJobs from '../pages/candidate/CandidateJobs';
-import Applications from '../pages/candidate/Applications';
-import Profile from '../pages/candidate/Profile';
-//recruiter
-import RecruiterLayout from '../layout/RecruiterLayout';
-import RecruiterDashboard from '../pages/recruiter/RecruiterDashboard';
-import RecruiterJobs from '../pages/recruiter/RecruiterJobs';
-import CreateJob from '../pages/recruiter/CreateJob';
-import RecruiterApplications from '../pages/recruiter/RecruiterApplications';
-import RecruiterCandidates from '../pages/recruiter/RecruiterCandidates';
-import CompanyProfile from '../pages/recruiter/CompanyProfile';
-import RecruiterSettings from '../pages/recruiter/RecruiterSettings';
-//Admin
-import AdminLayout from '../layout/AdminLayout';
-import AdminDashboard from '../pages/admin/AdminDashboard';
-import AdminUsers from '../pages/admin/AdminUsers';
+import Home from '../pages/Home'
 import ProtectedRoute from './ProtectedRoute';
 import Unauthorized from '../common/Unauthorized';
-import JobDetails from '../pages/candidate/JobDetails';
+// Candidate
+const CandidateLayout = lazy(
+  () => import("../layout/CandidateLayout")
+);
+
+const CandidateDashboard = lazy(
+  () => import("../pages/candidate/CandidateDashboard")
+);
+
+const CandidateJobs = lazy(
+  () => import("../pages/candidate/CandidateJobs")
+);
+
+const Applications = lazy(
+  () => import("../pages/candidate/Applications")
+);
+
+const Profile = lazy(
+  () => import("../pages/candidate/Profile")
+);
+
+const JobDetails = lazy(
+  () => import("../pages/candidate/JobDetails")
+);
+
+
+// Recruiter
+const RecruiterLayout = lazy(
+  () => import("../layout/RecruiterLayout")
+);
+
+const RecruiterDashboard = lazy(
+  () => import("../pages/recruiter/RecruiterDashboard")
+);
+
+const RecruiterJobs = lazy(
+  () => import("../pages/recruiter/RecruiterJobs")
+);
+
+const CreateJob = lazy(
+  () => import("../pages/recruiter/CreateJob")
+);
+
+const RecruiterApplications = lazy(
+  () => import("../pages/recruiter/RecruiterApplications")
+);
+
+const RecruiterCandidates = lazy(
+  () => import("../pages/recruiter/RecruiterCandidates")
+);
+
+const CompanyProfile = lazy(
+  () => import("../pages/recruiter/CompanyProfile")
+);
+
+const RecruiterSettings = lazy(
+  () => import("../pages/recruiter/RecruiterSettings")
+);
+
+
+// Admin
+const AdminLayout = lazy(
+  () => import("../layout/AdminLayout")
+);
+
+const AdminDashboard = lazy(
+  () => import("../pages/admin/AdminDashboard")
+);
+
+const AdminUsers = lazy(
+  () => import("../pages/admin/AdminUsers")
+);
+
 export const routes = [
+    { path: '/', element: <Home/>, children: [] },
     { path: '/register', element: <Register />, children: [] },
     { path: '/login', element: <Login />, children: [] },
     //Candidate

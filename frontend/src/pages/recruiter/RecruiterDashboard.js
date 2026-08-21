@@ -1,101 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import { toast } from "react-toastify";
+import {useAuth} from '../../context/AuthProvider'
+import { getCompanyByRecruiter } from "../../services/company.service";
+import { getJobByRecruiter } from "../../services/job.service";
 const RecruiterDashboard = () => {
-  const recruiter = {
-    user_id: 5,
-    full_name: "Rahul Sharma",
-    email: "rahul@technova.com",
-    phone: 9876543210,
-    user_type: "RECRUITER",
-    status: "ACTIVE",
-  };
+  const {user}=useAuth();
+  const [company,setCompany]=useState(null);
+  const [jobs,setJobs]=useState(null);
+  const getCompany=async()=>{
+    try {
+      const response=await getCompanyByRecruiter();
+      if(response.data?.statusCode===200){
+        setCompany(response.data?.data?.company);
+      }else{
+        toast.error(response.data?.msg);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  const getJobs=async()=>{
+    try {
+      const response=await getJobByRecruiter();
+      if(response.data?.statusCode===200){
+        setJobs(response.data?.data?.jobs);
+      }else{
+        toast.error(response.data?.msg);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  useEffect(()=>{
+    getCompany();
+    getJobs();
+  },[])
 
-  const company = {
-    company_id: 1,
-    company_name: "TechNova Solutions",
-    industry: "Information Technology",
-    company_size: 500,
-    company_logo: "",
-    company_website: "https://technova.example.com",
-    about_company:
-      "Technology company building modern software solutions.",
-  };
-
-  const jobs = [
-    {
-      job_id: 1,
-      title: "Senior React Developer",
-      job_description:
-        "Develop and maintain modern web applications using React.",
-      requirements:
-        "3+ years of frontend development experience.",
-      skills: "React, JavaScript, HTML, CSS, Bootstrap",
-      category_id: 1,
-      company_id: 1,
-      recruiter_id: 5,
-      location: "Noida, India",
-      work_mode: "HYBRID",
-      employment_type: "FULL_TIME",
-      experience_min: 3,
-      experience_max: 6,
-      salary_min: 1000000,
-      salary_max: 1500000,
-      salary_currency: "INR",
-      vacancies: 2,
-      posted_on: "2026-08-10",
-      application_deadline: "2026-09-10",
-      status: "ACTIVE",
-    },
-    {
-      job_id: 2,
-      title: "Node.js Developer",
-      job_description:
-        "Build scalable backend services and REST APIs.",
-      requirements:
-        "2+ years of Node.js and Express development.",
-      skills: "Node.js, Express, Sequelize, MySQL",
-      category_id: 1,
-      company_id: 1,
-      recruiter_id: 5,
-      location: "Delhi, India",
-      work_mode: "ONSITE",
-      employment_type: "FULL_TIME",
-      experience_min: 2,
-      experience_max: 5,
-      salary_min: 700000,
-      salary_max: 1200000,
-      salary_currency: "INR",
-      vacancies: 3,
-      posted_on: "2026-08-08",
-      application_deadline: "2026-09-05",
-      status: "ACTIVE",
-    },
-    {
-      job_id: 3,
-      title: "Frontend Engineer",
-      job_description:
-        "Create responsive user interfaces for web applications.",
-      requirements:
-        "Strong JavaScript and frontend framework experience.",
-      skills: "React, JavaScript, TypeScript, CSS",
-      category_id: 1,
-      company_id: 1,
-      recruiter_id: 5,
-      location: "Remote",
-      work_mode: "REMOTE",
-      employment_type: "FULL_TIME",
-      experience_min: 2,
-      experience_max: 4,
-      salary_min: 800000,
-      salary_max: 1400000,
-      salary_currency: "INR",
-      vacancies: 2,
-      posted_on: "2026-08-06",
-      application_deadline: "2026-09-15",
-      status: "CLOSED",
-    },
-  ];
 
   const applications = [
     {
@@ -157,11 +98,11 @@ const RecruiterDashboard = () => {
     },
   ];
 
-  const activeJobs = jobs.filter(
+  const activeJobs = jobs?.filter(
     (job) => job.status === "ACTIVE"
   ).length;
 
-  const draftJobs = jobs.filter(
+  const draftJobs = jobs?.filter(
     (job) => job.status === "DRAFT"
   ).length;
 
@@ -229,7 +170,7 @@ const RecruiterDashboard = () => {
             </p>
 
             <h2 className="fw-bold mb-1">
-              Welcome back, {recruiter.full_name.split(" ")[0]} 👋
+              Welcome back, {user.name} 👋
             </h2>
 
             <p className="text-secondary mb-0">
@@ -277,17 +218,20 @@ const RecruiterDashboard = () => {
                 fontSize: "28px",
               }}
             >
-              {company.company_name.charAt(0)}
+              <img 
+              width={40}
+              height={40}
+              src={company?.company_logo}/>
             </div>
 
             <div className="ms-md-4 mt-3 mt-md-0 text-white flex-grow-1">
 
               <h4 className="fw-bold mb-1">
-                {company.company_name}
+                {company?.company_name}
               </h4>
 
               <p className="text-white-50 mb-2">
-                {company.industry} • {company.company_size}+ employees
+                {company?.industry} • {company?.company_size}+ employees
               </p>
 
               <span
@@ -559,7 +503,7 @@ const RecruiterDashboard = () => {
 
 
           {jobs
-            .filter((job) => job.status === "ACTIVE")
+            ?.filter((job) => job.status === "ACTIVE")
             .map((job) => (
 
               <div
@@ -582,7 +526,7 @@ const RecruiterDashboard = () => {
                         fontWeight: "700",
                       }}
                     >
-                      {company.company_name.charAt(0)}
+                      {company?.company_name}
                     </div>
 
 

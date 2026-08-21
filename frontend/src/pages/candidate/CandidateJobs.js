@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getJobs } from "../../services/job.service";
-import { useAuth } from '../../context/AuthProvider';
-import Loader from "../../common/Loader";
 import { applyjob } from "../../services/application.service";
 
 const CandidateJobs = () => {
@@ -11,6 +9,11 @@ const CandidateJobs = () => {
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [filters, setFilters] = useState([]);
+  const [searchFilter,setSearchFilter]=useState({
+    keywords: "",
+    location: "",
+    workMode: "",
+  })
   const formatSalary = (job) => {
     const min = job.salary_min / 100000;
     const max = job.salary_max / 100000;
@@ -83,9 +86,9 @@ const CandidateJobs = () => {
       toast.error(error.message);
     }
   }
-  const getAllJobs = async (limit, offset, filters) => {
+  const getAllJobs = async (limit, offset, filters=[],searchFilter) => {
     try {
-      const response = await getJobs(limit, offset, filters);
+      const response = await getJobs(limit, offset, filters,searchFilter);
       console.log(response);
       if (response.data?.statusCode === 200) {
         setJobs(response.data?.data?.jobs);
@@ -98,8 +101,20 @@ const CandidateJobs = () => {
   const PAGE_NUMBER = Math.ceil(total / 5);
   const offset = currentPage * 5;
   useEffect(() => {
-    getAllJobs(5, offset, filters);
+    getAllJobs(5, offset, filters,searchFilter);
   }, [currentPage, filters])
+  const handleOnchangeSearch=(e)=>{
+    const name=e.target.name;
+    const val=e.target.value;
+    setSearchFilter((prev)=>(
+      {...prev,[name]:val}
+    ))
+  }
+  const handleSubmitSearch=async()=>{
+    setCurrentPage(0);
+    // console.log(searchFilter);
+    getAllJobs(5,offset,filters,searchFilter);
+  }
   return (
     <div>
 
@@ -165,6 +180,9 @@ const CandidateJobs = () => {
                   type="text"
                   className="form-control form-control-lg bg-light border-0"
                   placeholder="Job title, skills or keywords"
+                  value={searchFilter.keywords}
+                  name="keywords"
+                  onChange={handleOnchangeSearch}
                 />
 
               </div>
@@ -188,6 +206,9 @@ const CandidateJobs = () => {
                   type="text"
                   className="form-control form-control-lg bg-light border-0"
                   placeholder="City or location"
+                  value={searchFilter.location}
+                  name="location"
+                  onChange={handleOnchangeSearch}
                 />
 
               </div>
@@ -201,7 +222,11 @@ const CandidateJobs = () => {
                 Work Mode
               </label>
 
-              <select className="form-select form-select-lg bg-light border-0">
+              <select 
+              value={searchFilter.workMode}
+              name="workMode"
+              onChange={handleOnchangeSearch}
+              className="form-select form-select-lg bg-light border-0">
 
                 <option>All</option>
                 <option>ONSITE</option>
@@ -216,6 +241,7 @@ const CandidateJobs = () => {
             <div className="col-lg-2 d-flex align-items-end">
 
               <button
+                onClick={handleSubmitSearch}
                 className="btn btn-lg w-100 text-white fw-semibold"
                 style={{
                   background:

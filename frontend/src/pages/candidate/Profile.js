@@ -1,14 +1,15 @@
 import React from "react";
-
+import {useAuth} from '../../context/AuthProvider';
 const Profile = () => {
-  const user = {
-    user_id: 1,
-    full_name: "Nurul Islam",
-    email: "nurul@example.com",
-    phone: 9876543210,
-    user_type: "CANDIDATE",
-    status: "ACTIVE",
-  };
+  const {user}=useAuth();
+  // const user = {
+  //   user_id: 1,
+  //   full_name: "Nurul Islam",
+  //   email: "nurul@example.com",
+  //   phone: 9876543210,
+  //   user_type: "CANDIDATE",
+  //   status: "ACTIVE",
+  // };
 
   const skills = [
     "JavaScript",
@@ -98,7 +99,7 @@ const Profile = () => {
             <div className="ms-md-4 mt-3 mt-md-0 flex-grow-1">
 
               <h3 className="fw-bold mb-1">
-                {user.full_name}
+                {user.name}
               </h3>
 
               <p className="text-secondary mb-2">
@@ -114,7 +115,7 @@ const Profile = () => {
                     color: "#7f1d3f",
                   }}
                 >
-                  {user.user_type}
+                  {user.role}
                 </span>
 
                 <span className="text-secondary small align-self-center">
@@ -193,7 +194,7 @@ const Profile = () => {
                   </small>
 
                   <span className="fw-semibold">
-                    {user.full_name}
+                    {user.name}
                   </span>
 
                 </div>
@@ -232,7 +233,7 @@ const Profile = () => {
                   </small>
 
                   <span className="fw-semibold">
-                    {user.user_type}
+                    {user.role}
                   </span>
 
                 </div>

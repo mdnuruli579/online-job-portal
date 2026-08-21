@@ -32,9 +32,43 @@ export const transporter = nodemailer.createTransport({
     refreshToken: GOOGLE_REFRESH_TOKEN,
   },
 });
-export const getWereFilter = (filters) => {
+export const getWereFilter = (filters, search) => {
   const where = {};
+  if (search) {
+    const { location, workMode, keywords } = search;
+    // Keyword search
+    if (keywords) {
+      where[Op.or] = [
+        {
+          title: {
+            [Op.like]: `%${keywords}%`
+          }
+        },
+        {
+          skills: {
+            [Op.like]: `%${keywords}%`
+          }
+        },
+        {
+          job_description: {
+            [Op.like]: `%${keywords}%`
+          }
+        }
+      ];
+    }
 
+    // Location filter
+    if (location) {
+      where.location = {
+        [Op.like]: `%${location}%`
+      };
+    }
+
+    // Work mode filter
+    if (workMode) {
+      where.work_mode = workMode;
+    }
+  }
   // =========================
   // CATEGORY
   // =========================

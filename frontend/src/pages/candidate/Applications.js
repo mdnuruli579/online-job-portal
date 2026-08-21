@@ -1,134 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getApplication } from "../../services/application.service";
 
 const Applications = () => {
-  const applications = [
-    {
-      application_id: 1,
-      applied_on: "2026-08-10",
-      status: "SHORTLISTED",
-
-      job: {
-        job_id: 1,
-        title: "Senior React Developer",
-        location: "Noida, India",
-        work_mode: "HYBRID",
-        employment_type: "FULL_TIME",
-        salary_min: 1000000,
-        salary_max: 1500000,
-        salary_currency: "INR",
-      },
-
-      company: {
-        company_id: 1,
-        company_name: "TechNova Solutions",
-        industry: "Information Technology",
-        company_size: 500,
-        company_logo: "",
-      },
-    },
-
-    {
-      application_id: 2,
-      applied_on: "2026-08-08",
-      status: "UNDER_REVIEW",
-
-      job: {
-        job_id: 2,
-        title: "Node.js Developer",
-        location: "Delhi, India",
-        work_mode: "ONSITE",
-        employment_type: "FULL_TIME",
-        salary_min: 700000,
-        salary_max: 1200000,
-        salary_currency: "INR",
-      },
-
-      company: {
-        company_id: 2,
-        company_name: "Vertex Technologies",
-        industry: "Software Development",
-        company_size: 300,
-        company_logo: "",
-      },
-    },
-
-    {
-      application_id: 3,
-      applied_on: "2026-08-05",
-      status: "INTERVIEW",
-
-      job: {
-        job_id: 3,
-        title: "Frontend Engineer",
-        location: "Remote",
-        work_mode: "REMOTE",
-        employment_type: "FULL_TIME",
-        salary_min: 800000,
-        salary_max: 1400000,
-        salary_currency: "INR",
-      },
-
-      company: {
-        company_id: 3,
-        company_name: "PixelCraft Labs",
-        industry: "Information Technology",
-        company_size: 150,
-        company_logo: "",
-      },
-    },
-
-    {
-      application_id: 4,
-      applied_on: "2026-07-28",
-      status: "REJECTED",
-
-      job: {
-        job_id: 4,
-        title: "Full Stack Developer",
-        location: "Gurugram, India",
-        work_mode: "HYBRID",
-        employment_type: "FULL_TIME",
-        salary_min: 1200000,
-        salary_max: 1800000,
-        salary_currency: "INR",
-      },
-
-      company: {
-        company_id: 4,
-        company_name: "CloudMatrix Technologies",
-        industry: "Cloud Computing",
-        company_size: 800,
-        company_logo: "",
-      },
-    },
-
-    {
-      application_id: 5,
-      applied_on: "2026-07-20",
-      status: "APPLIED",
-
-      job: {
-        job_id: 5,
-        title: "JavaScript Developer",
-        location: "Bangalore, India",
-        work_mode: "HYBRID",
-        employment_type: "FULL_TIME",
-        salary_min: 600000,
-        salary_max: 1000000,
-        salary_currency: "INR",
-      },
-
-      company: {
-        company_id: 5,
-        company_name: "DigitalWorks India",
-        industry: "Information Technology",
-        company_size: 250,
-        company_logo: "",
-      },
-    },
-  ];
-
+  const[totalCount,setTotalCount]=useState(0);
+  const[underReviewCount,setUnderReviewCount]=useState(0);
+  const[shortlistedCount,setShortlistedCount]=useState(0); 
+  const[applications,setApplications]=useState([]);
+  const getJobApplication=async()=>{
+    try {
+      const response=await getApplication();
+      console.log(response);
+      if(response?.data?.statusCode===200){
+        const data=response?.data?.data;
+        setApplications(data);
+        setTotalCount(data.length);
+        const underReview=data?.filter((item)=>item.status==="UNDER_REVIEW");
+        setUnderReviewCount(underReview.length);
+        const shortlisted=data?.filter((item)=>item.status==="SHORTLISTED");
+        setShortlistedCount(shortlisted.length);
+      }
+      
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  useEffect(()=>{
+    getJobApplication();
+  },[])
   const getStatusStyle = (status) => {
     switch (status) {
       case "SHORTLISTED":
@@ -242,7 +142,7 @@ const Applications = () => {
               </small>
 
               <h2 className="fw-bold mt-2 mb-0">
-                12
+                {totalCount}
               </h2>
 
               <small className="text-secondary">
@@ -267,7 +167,7 @@ const Applications = () => {
               </small>
 
               <h2 className="fw-bold mt-2 mb-0">
-                4
+                {underReviewCount}
               </h2>
 
               <small className="text-secondary">
@@ -295,7 +195,7 @@ const Applications = () => {
                 className="fw-bold mt-2 mb-0"
                 style={{ color: "#7f1d3f" }}
               >
-                3
+                {shortlistedCount}
               </h2>
 
               <small className="text-secondary">
@@ -445,10 +345,10 @@ const Applications = () => {
 
 
           {/* APPLICATION ITEMS */}
-          {applications.map((application) => (
+          {applications && applications.map((application) => (
 
             <div
-              key={application.application_id}
+              key={application?.application_id}
               className="border-bottom px-4 py-4"
             >
 
@@ -470,25 +370,28 @@ const Applications = () => {
                         fontWeight: "700",
                       }}
                     >
-                      {application.company.company_name.charAt(0)}
+                     <img 
+                     width={40}
+                     height={40}
+                     src= {application?.job?.company?.company_logo} alt={application?.job?.company?.company_name}/>
                     </div>
 
                     <div>
 
                       <Link
-                        to={`/candidate/jobs/${application.job.job_id}`}
+                        to={`/candidate/jobs/${application?.job?.job_id}`}
                         className="text-decoration-none"
                       >
                         <h6
                           className="fw-bold mb-1"
                           style={{ color: "#292524" }}
                         >
-                          {application.job.title}
+                          {application?.job?.title}
                         </h6>
                       </Link>
 
                       <small className="text-secondary">
-                        {application.company.company_name}
+                        {application?.job?.company?.company_name}
                       </small>
 
                     </div>
@@ -506,11 +409,11 @@ const Applications = () => {
                   </small>
 
                   <div className="text-dark small mt-1 mt-lg-0">
-                    📍 {application.job.location}
+                    📍 {application?.job?.location}
                   </div>
 
                   <small className="text-secondary">
-                    {application.job.work_mode}
+                    {application?.job?.work_mode}
                   </small>
 
                 </div>
@@ -525,7 +428,7 @@ const Applications = () => {
 
                   <div className="text-dark small mt-1 mt-lg-0">
                     {new Date(
-                      application.applied_on
+                      application?.applied_on
                     ).toLocaleDateString("en-IN", {
                       day: "2-digit",
                       month: "short",
@@ -565,7 +468,7 @@ const Applications = () => {
                 <div className="col-6 col-lg-2 text-lg-end">
 
                   <Link
-                    to={`/candidate/jobs/${application.job.job_id}`}
+                    to={`/candidate/jobs/${application?.job?.job_id}`}
                     className="btn btn-sm px-3"
                     style={{
                       border: "1px solid #7f1d3f",
